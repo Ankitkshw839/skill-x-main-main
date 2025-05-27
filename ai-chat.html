@@ -691,6 +691,7 @@
 
     <script type="module">
         import { auth, handleLogout } from './auth.js';
+        import { OPENROUTER_CONFIG } from './config.js';
         
         // Add logout functionality
         document.getElementById('logoutBtn').addEventListener('click', handleLogout);
@@ -741,12 +742,12 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': 'Bearer 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',
+                        'Authorization': `Bearer ${OPENROUTER_CONFIG.API_KEY}`,
                         'HTTP-Referer': window.location.origin,
-                        'X-Title': 'Simplexify Learning Assistant'
+                        'X-Title': OPENROUTER_CONFIG.SITE_NAME
                     },
                     body: JSON.stringify({
-                        model: "mistralai/devstral-small:free",
+                        model: OPENROUTER_CONFIG.MODEL,
                         messages: [
                             {
                                 role: "system",
