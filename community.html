@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simplexify Learning Community</title>
+    <link rel="stylesheet" href="styles/community.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Add your existing CSS files here -->
+</head>
+<body>
+    <!-- Navigation will be included from your existing layout -->
+    <header class="fb-header">
+        <div class="header-left">
+            <a href="welcome2.html" class="logo">
+                <i class="fas fa-graduation-cap"></i>
+                Simplexify
+            </a>
+            <div class="search-container">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search for learners or courses...">
+            </div>
+        </div>
+        <div class="header-center">
+            <a href="dashboard.html" class="nav-icon"><i class="fas fa-home"></i></a>
+            <a href="community.html" class="nav-icon active"><i class="fas fa-users"></i></a>
+            <a href="mycourses.html" class="nav-icon"><i class="fas fa-book"></i></a>
+            <a href="calendar.html" class="nav-icon"><i class="fas fa-calendar"></i></a>
+        </div>
+        <div class="header-right">
+            <a href="#" class="nav-icon" id="notification-icon">
+                <i class="fas fa-bell"></i>
+                <span id="header-notification-badge" class="notification-badge">0</span>
+            </a>
+            <a href="profile.html" class="profile-link">
+                <img src="https://via.placeholder.com/40" alt="Profile" class="header-profile-pic" id="header-profile-pic">
+            </a>
+        </div>
+    </header>
+    
+    <main class="fb-layout" id="community-container">
+        <!-- Left Sidebar -->
+        <div class="fb-sidebar left-sidebar">
+            <div class="sidebar-section">
+                <a href="profile.html" class="sidebar-item" id="sidebar-profile">
+                    <img src="https://via.placeholder.com/36" alt="Profile" class="sidebar-profile-pic">
+                    <span class="sidebar-text" id="sidebar-username">Your Name</span>
+                </a>
+                <a href="mycourses.html" class="sidebar-item">
+                    <i class="fas fa-book-open"></i>
+                    <span class="sidebar-text">My Courses</span>
+                </a>
+                <a href="#" class="sidebar-item">
+                    <i class="fas fa-user-friends"></i>
+                    <span class="sidebar-text">My Connections</span>
+                    <span class="sidebar-badge" id="connections-count">0</span>
+                </a>
+                <a href="#" class="sidebar-item">
+                    <i class="fas fa-comments"></i>
+                    <span class="sidebar-text">Study Groups</span>
+                </a>
+                <a href="#" class="sidebar-item">
+                    <i class="fas fa-certificate"></i>
+                    <span class="sidebar-text">Achievements</span>
+                </a>
+                <a href="calendar.html" class="sidebar-item">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span class="sidebar-text">Events</span>
+                </a>
+            </div>
+            
+            <div class="sidebar-section">
+                <div class="sidebar-header">Your Courses</div>
+                <div id="sidebar-courses">
+                    <div class="sidebar-loading">Loading courses...</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="fb-main">
+            <!-- Tabs Navigation -->
+            <div class="fb-tabs">
+                <button class="fb-tab-btn active" data-tab="potential-connections-tab">
+                    <i class="fas fa-user-plus"></i> Find Connections
+                </button>
+                <button class="fb-tab-btn" data-tab="notifications-tab">
+                    <i class="fas fa-bell"></i> Notifications
+                    <span id="notification-badge" class="notification-badge">0</span>
+                </button>
+                <button class="fb-tab-btn" data-tab="friends-tab">
+                    <i class="fas fa-users"></i> My Connections
+                </button>
+            </div>
+            
+            <!-- Status Update -->
+            <div class="status-update-card">
+                <div class="status-update-header">
+                    <img src="https://via.placeholder.com/40" alt="Profile" class="status-profile-pic" id="status-profile-pic">
+                    <input type="text" placeholder="What are you learning today?" class="status-input">
+                </div>
+                <div class="status-update-actions">
+                    <button class="status-action">
+                        <i class="fas fa-image"></i> Photo
+                    </button>
+                    <button class="status-action">
+                        <i class="fas fa-video"></i> Video
+                    </button>
+                    <button class="status-action">
+                        <i class="fas fa-graduation-cap"></i> Course
+                    </button>
+                    <button class="status-post">Post</button>
+                </div>
+            </div>
+            
+            <!-- Tab Content -->
+            <div class="fb-tab-content">
+                <!-- Potential Connections Tab -->
+                <div id="potential-connections-tab" class="fb-tab-pane active">
+                    <div class="content-card">
+                        <div class="card-header">
+                            <h2><i class="fas fa-user-plus"></i> People You May Know</h2>
+                            <p class="card-subtitle">Based on your course interests</p>
+                        </div>
+                        <div id="potential-connections" class="content-area">
+                            <div class="loading">Loading potential connections...</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Notifications Tab -->
+                <div id="notifications-tab" class="fb-tab-pane">
+                    <div class="content-card">
+                        <div class="card-header">
+                            <h2><i class="fas fa-bell"></i> Notifications</h2>
+                            <p class="card-subtitle">Friend requests and other updates</p>
+                        </div>
+                        <div id="notifications" class="content-area">
+                            <div class="loading">Loading notifications...</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Friends Tab -->
+                <div id="friends-tab" class="fb-tab-pane">
+                    <div class="content-card">
+                        <div class="card-header">
+                            <h2><i class="fas fa-users"></i> My Connections</h2>
+                            <p class="card-subtitle">People you've connected with</p>
+                        </div>
+                        <div id="friends" class="content-area">
+                            <div class="loading">Loading connections...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Sidebar -->
+        <div class="fb-sidebar right-sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-header">Learning Stats</div>
+                <div class="stats-item">
+                    <div class="stats-label">Courses in Progress</div>
+                    <div class="stats-value" id="stats-courses">0</div>
+                </div>
+                <div class="stats-item">
+                    <div class="stats-label">Hours Learned</div>
+                    <div class="stats-value" id="stats-hours">0</div>
+                </div>
+                <div class="stats-item">
+                    <div class="stats-label">Connections</div>
+                    <div class="stats-value" id="stats-connections">0</div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <script type="module">
+        import { initCommunityPage } from './community.js';
+        import { getCurrentUser } from './auth.js'; // Adjust path as needed
+        
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // Get current user
+                const user = await getCurrentUser();
+                
+                if (user) {
+                    // Set profile pictures and username
+                    const profilePic = user.photoURL || 'https://via.placeholder.com/40';
+                    document.getElementById('header-profile-pic').src = profilePic;
+                    document.getElementById('status-profile-pic').src = profilePic;
+                    document.getElementById('sidebar-profile').querySelector('img').src = profilePic;
+                    document.getElementById('sidebar-username').textContent = user.displayName || 'Learner';
+                    
+                    // Initialize community page with user ID
+                    initCommunityPage(user.uid);
+                    
+                    // Update tab navigation
+                    setupTabs();
+                } else {
+                    // Handle not logged in state
+                    document.getElementById('community-container').innerHTML = `
+                        <div class="auth-required">
+                            <h2>Authentication Required</h2>
+                            <p>Please log in to access the community features.</p>
+                            <a href="login.html" class="btn btn-primary">Log In</a>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error("Error initializing community page:", error);
+                document.getElementById('community-container').innerHTML = `
+                    <div class="error-state">
+                        <h2>Something went wrong</h2>
+                        <p>We couldn't load the community features. Please try again later.</p>
+                    </div>
+                `;
+            }
+        });
+        
+        // Set up tab navigation
+        function setupTabs() {
+            const tabButtons = document.querySelectorAll('.fb-tab-btn');
+            const tabPanes = document.querySelectorAll('.fb-tab-pane');
+            
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    // Remove active class from all buttons and panes
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabPanes.forEach(pane => pane.classList.remove('active'));
+                    
+                    // Add active class to clicked button and corresponding pane
+                    button.classList.add('active');
+                    const tabId = button.getAttribute('data-tab');
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+        }
+    </script>
+</body>
+</html> 

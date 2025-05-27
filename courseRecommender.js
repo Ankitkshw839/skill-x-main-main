@@ -1,4 +1,5 @@
 import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-database.js";
+import { OPENROUTER_CONFIG } from "./config.js";
 
 // Define image categories for different course types
 const courseImageCategories = {
@@ -185,18 +186,18 @@ async function callOpenRouterAPI(userData) {
     console.log("Calling OpenRouter API with data:", userData);
     
     try {
-        console.log("Making API request to OpenRouter with model: mistralai/devstral-small:free");
+        console.log(`Making API request to OpenRouter with model: ${OPENROUTER_CONFIG.MODEL}`);
         
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-                'Authorization': 'Bearer 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',
+                'Authorization': `Bearer ${OPENROUTER_CONFIG.API_KEY}`,
             'HTTP-Referer': window.location.origin,
-            'X-Title': 'Simplexify Learning Platform'
+            'X-Title': OPENROUTER_CONFIG.SITE_NAME
         },
         body: JSON.stringify({
-                model: "mistralai/devstral-small:free",
+                model: OPENROUTER_CONFIG.MODEL,
             messages: [
                 {
                     role: "system",
@@ -383,9 +384,22 @@ export async function generateCourseRecommendations(userData) {
     }
 }
 
-// Export a dummy function that doesn't actually save to the database
+// Save the course recommendations to Firebase database
 export async function saveCourseRecommendations(userId, courses) {
-    // This function now just returns success without saving to database
-    console.log("Not saving recommended courses to database as requested.");
+    try {
+        console.log("Saving course recommendations for user:", userId);
+        const database = getDatabase();
+        const userRef = ref(database, `users/${userId}`);
+        
+        // Save the courses under the user's recommendedCourses node
+        await set(userRef, {
+            recommendedCourses: courses
+        });
+
+        console.log("Successfully saved recommendations");
         return true;
+    } catch (error) {
+        console.error("Error saving course recommendations:", error);
+        throw error;
+    }
 } 

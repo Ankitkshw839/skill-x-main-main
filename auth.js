@@ -1,6 +1,7 @@
 // Firebase Authentication Module
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
+import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-database.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyCGV8-zgiG0z04OTU-bK7fbOWPLT4X6TFY",
@@ -71,3 +72,55 @@ export async function handleLogout() {
 
 // Export auth instance for use in other files
 export { auth }; 
+
+// Get the current authenticated user
+export function getCurrentUser() {
+    return new Promise((resolve, reject) => {
+        const auth = getAuth();
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            unsubscribe();
+            resolve(user);
+        }, reject);
+    });
+}
+
+// Save user profile data
+export async function saveUserProfile(userId, profileData) {
+    try {
+        const database = getDatabase();
+        const userProfileRef = ref(database, `users/${userId}/profile`);
+        
+        // Merge with existing data if available
+        const snapshot = await get(userProfileRef);
+        const existingData = snapshot.exists() ? snapshot.val() : {};
+        
+        await set(userProfileRef, {
+            ...existingData,
+            ...profileData,
+            updatedAt: Date.now()
+        });
+        
+        return true;
+    } catch (error) {
+        console.error("Error saving user profile:", error);
+        throw error;
+    }
+}
+
+// Get user profile data
+export async function getUserProfile(userId) {
+    try {
+        const database = getDatabase();
+        const userProfileRef = ref(database, `users/${userId}/profile`);
+        const snapshot = await get(userProfileRef);
+        
+        if (snapshot.exists()) {
+            return snapshot.val();
+        } else {
+            return null;
+        }
+    } catch (error) {
+        console.error("Error getting user profile:", error);
+        throw error;
+    }
+} 

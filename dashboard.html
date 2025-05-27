@@ -438,6 +438,37 @@
             text-decoration: underline;
         }
 
+        /* Community Card Styles */
+        .community-preview {
+            padding: 8px 0;
+            text-align: center;
+        }
+
+        .community-preview p {
+            color: var(--gray-700);
+            margin-bottom: 12px;
+        }
+
+        .community-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .community-stats span {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--gray-600);
+            font-size: 0.9rem;
+        }
+
+        .community-stats i {
+            color: var(--primary-color);
+        }
+
+        /* Mini Calendar Styles */
         .mini-calendar {
             width: 100%;
             border-collapse: collapse;
@@ -696,6 +727,25 @@
                                     <!-- Calendar will be generated dynamically -->
                                 </tbody>
                             </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Community Card -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-users"></i> Learning Community</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="community-preview">
+                            <p>Connect with learners who share your interests and courses.</p>
+                            <p class="community-stats">
+                                <span><i class="fas fa-user-friends"></i> Find study partners</span>
+                                <span><i class="fas fa-comments"></i> Discuss course topics</span>
+                            </p>
+                            <a href="community.html" class="primary-btn">
+                                <i class="fas fa-users"></i> Explore Community
+                            </a>
                         </div>
                     </div>
                 </div>

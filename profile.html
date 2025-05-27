@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile | Simplexify</title>
+    <title>Your Profile - Simplexify Learning</title>
+    <link rel="stylesheet" href="styles/profile.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -564,6 +565,56 @@
             padding: 2rem;
             color: #666;
         }
+
+        .profile-picture-section {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .profile-picture-container {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin: 0 auto;
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border: 3px solid white;
+        }
+        
+        .profile-picture {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .profile-picture-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 8px 0;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .profile-picture-container:hover .profile-picture-overlay {
+            opacity: 1;
+        }
+        
+        .change-pic-btn {
+            color: white;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: block;
+        }
+        
+        .profile-picture-help {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 0.5rem;
+        }
     </style>
 </head>
 <body>
@@ -585,581 +636,110 @@
         <div class="spinner"></div>
     </div>
 
-    <div class="profile-container">
+    <main class="profile-container">
         <div class="profile-header">
-            <div class="profile-avatar">
-                <img src="assets/images/boy.png" alt="Profile Avatar">
-                    </div>
-            <div class="profile-header-info">
-                <h1>
-                    <span class="gradient-text highlight">
-                        Your Profile
-                        <div class="sparkle-container">
-                            <div class="sparkle"></div>
-                            <div class="sparkle"></div>
-                            <div class="sparkle"></div>
-                            <div class="sparkle"></div>
-                            <div class="sparkle"></div>
-                            <div class="sparkle"></div>
-                </div>
-                    </span>
-                </h1>
+            <h1>Your Profile</h1>
                 <p>Manage your personal information and preferences</p>
-            </div>
         </div>
 
-        <div class="profile-sections-grid">
-            <div class="profile-section">
-                <div class="section-title">
-                    <span>Personal Information</span>
-                    <button class="edit-btn" onclick="toggleEdit('personal')">
-                        <i class="fas fa-pencil-alt"></i> Edit
-                    </button>
+        <div class="profile-content">
+            <div class="profile-sidebar">
+                <div class="profile-nav">
+                    <a href="#profile-info" class="profile-nav-item active">Profile Information</a>
+                    <a href="#enrolled-courses" class="profile-nav-item">Enrolled Courses</a>
+                    <a href="community.html" class="profile-nav-item">Community</a>
                 </div>
-                <div class="profile-fields-grid">
-                    <div class="profile-field" data-field="name">
-                        <label>Full Name</label>
-                        <span></span>
-                        <input type="text" placeholder="Enter your full name">
-                    </div>
-                    <div class="profile-field" data-field="email">
-                        <label>Email</label>
-                        <span></span>
-                        <input type="email" readonly>
-                    </div>
-                    <div class="profile-field" data-field="dob">
-                        <label>Date of Birth</label>
-                        <span></span>
-                        <input type="date">
-                    </div>
-                    <div class="profile-field" data-field="occupation">
-                        <label>Occupation</label>
-                        <span></span>
-                        <input type="text" placeholder="Enter your occupation">
-                    </div>
-                    <div class="profile-field" data-field="phone">
-                        <label>Phone Number</label>
-                        <span></span>
-                        <input type="tel" placeholder="Enter your 10-digit phone number" maxlength="10" pattern="[0-9]{10}">
-                    </div>
-                </div>
-                <button class="save-btn" data-section="personal">Save Changes</button>
             </div>
 
-            <div class="profile-section">
-                <div class="section-title">
-                    <span>Location</span>
-                    <button class="edit-btn" onclick="toggleEdit('location')">
-                        <i class="fas fa-pencil-alt"></i> Edit
-                    </button>
+            <div class="profile-main">
+                <!-- Profile Message Area -->
+                <div id="profile-message"></div>
+                
+                <!-- Profile Information Section -->
+                <section id="profile-info" class="profile-section active">
+                    <h2>Profile Information</h2>
+                    
+                    <div class="profile-picture-section">
+                        <div class="profile-picture-container">
+                            <img id="profile-pic" src="https://via.placeholder.com/150" alt="Profile Picture" class="profile-picture">
+                            <div class="profile-picture-overlay">
+                                <label for="profile-pic-upload" class="change-pic-btn">
+                                    <i class="fas fa-camera"></i> Change
+                                </label>
                     </div>
-                <div class="profile-fields-grid">
-                    <div class="profile-field" data-field="country">
-                        <label>Country</label>
-                        <span></span>
-                        <select id="country" onchange="updateCities()"></select>
                     </div>
-                    <div class="profile-field" data-field="city">
-                        <label>City</label>
-                        <span></span>
-                        <select id="city"></select>
-                    </div>
-                </div>
-                <button class="save-btn" data-section="location">Save Changes</button>
+                        <input type="file" id="profile-pic-upload" accept="image/*" style="display: none;">
+                        <p class="profile-picture-help">Your Google profile picture will be used automatically if you logged in with Google</p>
             </div>
 
-            <div class="profile-section full-width">
-                <div class="section-title">
-                    <span>Learning Preferences</span>
-                    <button class="edit-btn" onclick="window.location.href='onboarding.html'">
-                        <i class="fas fa-pencil-alt"></i> Update
-                    </button>
+                    <form id="profile-form" class="profile-form">
+                        <div class="form-group">
+                            <label for="name">Full Name</label>
+                            <input type="text" id="name" name="name" placeholder="Enter your full name">
                         </div>
-                <div class="profile-fields-grid">
-                    <div class="profile-field" data-field="mainInterest">
-                        <label>Main Interest</label>
-                        <span></span>
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" name="email" placeholder="Enter your email">
                     </div>
-                    <div class="profile-field" data-field="experienceLevel">
-                        <label>Experience Level</label>
-                        <span></span>
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" name="phone" placeholder="Enter your phone number">
                     </div>
-                    <div class="profile-field full-width" data-field="specificInterests">
-                        <label>Specific Interests</label>
-                        <div class="interests-grid"></div>
+                        <div class="form-group">
+                            <label for="dob">Date of Birth</label>
+                            <input type="date" id="dob" name="dob">
                     </div>
+                        <div class="form-group">
+                            <label for="bio">Bio</label>
+                            <textarea id="bio" name="bio" placeholder="Tell us about yourself"></textarea>
+                </div>
+                        <div class="form-group">
+                            <label for="interests">Interests (comma-separated)</label>
+                            <input type="text" id="interests" name="interests" placeholder="e.g. Programming, Design, Marketing">
+            </div>
+                        <button type="submit" class="btn btn-primary">Save Profile</button>
+                    </form>
+                </section>
+                
+                <!-- Enrolled Courses Section -->
+                <section id="enrolled-courses" class="profile-section">
+                    <h2>Your Courses</h2>
+                    <p>Courses you're currently enrolled in:</p>
+                    
+                    <div id="user-courses" class="user-courses">
+                        <div class="loading">Loading your courses...</div>
+                </div>
+                </section>
                 </div>
             </div>
-
-            <div class="profile-section full-width">
-                <h3 class="section-title">
-                    <span>My Learning Journey</span>
-                </h3>
-                <div id="courses-chart-container" class="chart-container">
-                    <canvas id="coursesChart"></canvas>
-                </div>
-                <div id="chart-legend" class="chart-legend">
-                    <!-- Legend items will be added dynamically -->
-                </div>
-            </div>
-        </div>
-    </div>
+    </main>
 
     <script type="module">
-        import { auth, handleLogout } from './auth.js';
-        import { getDatabase, ref, get, onValue, update } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-database.js";
-        import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-storage.js";
-        import { getEnrolledCourses } from './courseEnrollment.js';
-
-        const database = getDatabase();
-        const storage = getStorage();
-        let currentUserData = null;
-        let coursesChart = null;
-
-        // Load user data when auth state changes
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                loadUserData(user.uid);
-            }
-        });
-
-        // Load user data from Firebase
-        function loadUserData(userId) {
-            showLoading(true);
-            const userRef = ref(database, 'users/' + userId);
-            onValue(userRef, (snapshot) => {
-                showLoading(false);
-                const data = snapshot.val();
-                if (data) {
-                    currentUserData = data;
-                    updateProfileUI(data);
-                }
-            }, (error) => {
-                showLoading(false);
-                console.error("Error loading user data:", error);
-                alert('Error loading your profile data. Please try again later.');
-            });
-        }
-
-        // Update profile UI with user data
-        function updateProfileUI(data) {
-            // Update header with user's name if exists
-            const headerTitle = document.querySelector('.profile-header-info h1');
-            if (data.name) {
-                headerTitle.innerHTML = `
-                    <span class="gradient-text highlight">
-                        ${data.name}
-                        <div class="sparkle-container">
-                            <div class="sparkle"></div>
-                            <div class="sparkle"></div>
-                            <div class="sparkle"></div>
-                            <div class="sparkle"></div>
-                            <div class="sparkle"></div>
-                            <div class="sparkle"></div>
-                        </div>
-                    </span>`;
-            }
-
-            // Update other fields
-            setFieldValue('name', data.name || '');
-            setFieldValue('email', data.email || '');
-            setFieldValue('dob', data.personalInfo?.dob || '');
-            setFieldValue('occupation', data.personalInfo?.occupation || '');
-            setFieldValue('phone', data.personalInfo?.phone || '');
-
-            // Update location
-            setFieldValue('country', data.location?.country || '');
-            setFieldValue('city', data.location?.city || '');
-
-            // Update learning preferences
-            setFieldValue('mainInterest', data.mainInterest || '');
-            setFieldValue('experienceLevel', data.experienceLevel || '');
-
-            // Update specific interests
-            const interestsGrid = document.querySelector('.interests-grid');
-            interestsGrid.innerHTML = '';
-            if (data.specificInterests && data.specificInterests.length > 0) {
-                data.specificInterests.forEach(interest => {
-                    const interestTag = document.createElement('div');
-                    interestTag.className = 'interest-tag';
-                    interestTag.textContent = interest.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-                    interestsGrid.appendChild(interestTag);
-                });
-            }
-
-            // Initialize country dropdown
-            initializeCountries();
-        }
-
-        // Set field value and update UI
-        function setFieldValue(fieldName, value) {
-            const field = document.querySelector(`[data-field="${fieldName}"]`);
-            if (field) {
-                const span = field.querySelector('span');
-                const input = field.querySelector('input, select');
-                if (span) span.textContent = value;
-                if (input) input.value = value;
-            }
-        }
-
-        // Toggle edit mode for a section
-        window.toggleEdit = function(section) {
-            const container = document.querySelector(`[data-section="${section}"]`).closest('.profile-section');
-            const fields = container.querySelectorAll('.profile-field');
-            const saveBtn = container.querySelector('.save-btn');
-
-            fields.forEach(field => field.classList.add('editing'));
-            saveBtn.classList.add('visible');
-        }
-
-        // Save changes for a section
-        async function saveChanges(section) {
-            const user = auth.currentUser;
-            if (!user) return;
-
-            showLoading(true);
-            const container = document.querySelector(`[data-section="${section}"]`).closest('.profile-section');
-            const fields = container.querySelectorAll('.profile-field');
-            const updates = {};
-
-            fields.forEach(field => {
-                const fieldName = field.dataset.field;
-                const input = field.querySelector('input, select');
-                if (input && input.value) {
-                    if (section === 'personal') {
-                        if (fieldName === 'name' || fieldName === 'email') {
-                            updates[fieldName] = input.value;
-                        } else {
-                            updates[`personalInfo/${fieldName}`] = input.value;
-                        }
-                    } else if (section === 'location') {
-                        updates[`location/${fieldName}`] = input.value;
-                    }
-                }
-            });
-
-            try {
-                await update(ref(database, 'users/' + user.uid), updates);
-                
-                // Update header immediately if name was changed
-                if (updates.name) {
-                    document.querySelector('.profile-header-info h1').innerHTML = `
-                        <span class="gradient-text highlight">
-                            ${updates.name}
-                            <div class="sparkle-container">
-                                <div class="sparkle"></div>
-                                <div class="sparkle"></div>
-                                <div class="sparkle"></div>
-                                <div class="sparkle"></div>
-                                <div class="sparkle"></div>
-                                <div class="sparkle"></div>
-                            </div>
-                        </span>`;
-                }
-                
-                // Reset edit mode
-                fields.forEach(field => field.classList.remove('editing'));
-                container.querySelector('.save-btn').classList.remove('visible');
-                
-                alert('Changes saved successfully!');
-            } catch (error) {
-                console.error("Error saving changes:", error);
-                alert('Error saving changes. Please try again.');
-            } finally {
-                showLoading(false);
-            }
-        }
-
-        // Initialize country dropdown
-        function initializeCountries() {
-            const countrySelect = document.getElementById('country');
-            if (!countrySelect) return;
-
-            // Clear existing options
-            countrySelect.innerHTML = '<option value="">Select your country</option>';
-
-            // Add countries
-            const countries = [
-                "United States", "United Kingdom", "Canada", "Australia", "India",
-                "Germany", "France", "Japan", "China", "Brazil"
-            ].sort();
-
-            countries.forEach(country => {
-                const option = document.createElement('option');
-                option.value = country;
-                option.textContent = country;
-                countrySelect.appendChild(option);
-            });
-
-            // Set current value if exists
-            if (currentUserData?.location?.country) {
-                countrySelect.value = currentUserData.location.country;
-                updateCities();
-            }
-        }
-
-        // Update cities based on selected country
-        window.updateCities = function() {
-            const countrySelect = document.getElementById('country');
-            const citySelect = document.getElementById('city');
-            if (!countrySelect || !citySelect) return;
-
-            const selectedCountry = countrySelect.value;
-            citySelect.innerHTML = '<option value="">Select your city</option>';
-
-            if (selectedCountry) {
-                const cities = {
-                    "United States": ["New York", "Los Angeles", "Chicago", "Houston", "Phoenix"],
-                    "United Kingdom": ["London", "Manchester", "Birmingham", "Glasgow", "Liverpool"],
-                    "Canada": ["Toronto", "Vancouver", "Montreal", "Calgary", "Ottawa"],
-                    "Australia": ["Sydney", "Melbourne", "Brisbane", "Perth", "Adelaide"],
-                    "India": ["Mumbai", "Delhi", "Bangalore", "Hyderabad", "Chennai"],
-                    "Germany": ["Berlin", "Hamburg", "Munich", "Cologne", "Frankfurt"],
-                    "France": ["Paris", "Marseille", "Lyon", "Toulouse", "Nice"],
-                    "Japan": ["Tokyo", "Osaka", "Nagoya", "Sapporo", "Fukuoka"],
-                    "China": ["Shanghai", "Beijing", "Guangzhou", "Shenzhen", "Chengdu"],
-                    "Brazil": ["São Paulo", "Rio de Janeiro", "Brasília", "Salvador", "Fortaleza"]
-                }[selectedCountry] || [];
-
-                cities.forEach(city => {
-                    const option = document.createElement('option');
-                    option.value = city;
-                    option.textContent = city;
-                    citySelect.appendChild(option);
-                });
-
-                // Set current value if exists
-                if (currentUserData?.location?.city) {
-                    citySelect.value = currentUserData.location.city;
-                }
-            }
-        }
-
-        // Show/hide loading spinner
-        function showLoading(show) {
-            const loader = document.querySelector('.loading');
-            if (show) {
-                loader.classList.add('visible');
-            } else {
-                loader.classList.remove('visible');
-                }
-        }
-
-        // Add event listeners to save buttons
-        document.querySelectorAll('.save-btn').forEach(btn => {
-            btn.addEventListener('click', () => saveChanges(btn.dataset.section));
-        });
-
-        // Update logout button event listener to use the new handleLogout function
-        document.getElementById('logoutBtn').addEventListener('click', handleLogout);
-
-        // Function to create the courses wheel chart
-        async function createCoursesChart() {
-            try {
-                // Get enrolled courses
-                const enrolledCourses = await getEnrolledCourses();
-                
-                console.log("Creating wheel chart with courses:", enrolledCourses);
-                
-                const chartContainer = document.getElementById('courses-chart-container');
-                const legendContainer = document.getElementById('chart-legend');
-                
-                // Check if we have courses to display
-                if (!Array.isArray(enrolledCourses) || enrolledCourses.length === 0) {
-                    chartContainer.innerHTML = `
-                        <div class="empty-chart-message">
-                            <i class="fas fa-chart-pie" style="font-size: 3rem; color: #ddd; margin-bottom: 1rem;"></i>
-                            <p>You haven't enrolled in any courses yet.</p>
-                            <a href="mycourses.html" style="color: #4c35de; text-decoration: none; display: inline-block; margin-top: 1rem;">
-                                Browse Courses <i class="fas fa-arrow-right"></i>
-                            </a>
-                        </div>
-                    `;
-                    legendContainer.innerHTML = '';
-                    return;
-                }
-                
-                // Define chart colors - vibrant colors that work well together
-                const colors = [
-                    '#4834d4', '#eb4d4b', '#6ab04c', '#f0932b', '#be2edd',
-                    '#686de0', '#badc58', '#f9ca24', '#22a6b3', '#e056fd',
-                    '#7ed6df', '#e17055', '#0984e3', '#d63031', '#fdcb6e'
-                ];
-                
-                // Prepare data for the chart
-                const labels = enrolledCourses.map(course => course.title);
-                const data = enrolledCourses.map(course => course.duration || 1); // Use duration as the value
-                const backgroundColors = colors.slice(0, enrolledCourses.length);
-                
-                // Create the chart
-                const ctx = document.getElementById('coursesChart').getContext('2d');
-                
-                // Destroy previous chart if it exists
-                if (coursesChart) {
-                    coursesChart.destroy();
-                }
-                
-                coursesChart = new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            data: data,
-                            backgroundColor: backgroundColors,
-                            borderColor: 'rgba(255, 255, 255, 0.5)',
-                            borderWidth: 2,
-                            hoverOffset: 15
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: {
-                                display: false
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        const label = context.label || '';
-                                        const value = context.raw || 0;
-                                        const course = enrolledCourses[context.dataIndex];
-                                        const progress = course.progress || 0;
-                                        return [
-                                            label,
-                                            `Duration: ${value} weeks`,
-                                            `Progress: ${progress}%`
-                                        ];
-                                    }
-                                }
-                            }
-                        },
-                        cutout: '60%',
-                        animation: {
-                            animateScale: true,
-                            animateRotate: true
-                        }
-                    }
-                });
-                
-                // Create custom legend
-                legendContainer.innerHTML = '';
-                
-                labels.forEach((label, index) => {
-                    const course = enrolledCourses[index];
-                    const legendItem = document.createElement('div');
-                    legendItem.className = 'legend-item';
-                    legendItem.innerHTML = `
-                        <div class="legend-color" style="background-color: ${backgroundColors[index]}"></div>
-                        <span>${label} (${course.progress || 0}%)</span>
-                    `;
-                    
-                    // Add click event to highlight the corresponding segment
-                    legendItem.addEventListener('click', () => {
-                        // Find which segment is active
-                        const activeSegments = coursesChart.getActiveElements();
+        import { initProfilePage } from './userProfile.js';
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set up tab navigation
+            const navItems = document.querySelectorAll('.profile-nav-item');
+            const sections = document.querySelectorAll('.profile-section');
+            
+            navItems.forEach(item => {
+                item.addEventListener('click', (event) => {
+                    event.preventDefault();
                         
-                        // If this segment is already active, deactivate all
-                        if (activeSegments.length === 1 && activeSegments[0].index === index) {
-                            coursesChart.setActiveElements([]);
-                        } else {
-                            // Otherwise activate just this segment
-                            coursesChart.setActiveElements([{
-                                datasetIndex: 0,
-                                index: index
-                            }]);
-                        }
-                        
-                        coursesChart.update();
-                    });
+                    // Remove active class from all items and sections
+                    navItems.forEach(i => i.classList.remove('active'));
+                    sections.forEach(s => s.classList.remove('active'));
                     
-                    legendContainer.appendChild(legendItem);
-                });
-                
-            } catch (error) {
-                console.error("Error creating courses chart:", error);
-                document.getElementById('courses-chart-container').innerHTML = `
-                    <div class="empty-chart-message">
-                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #d63031; margin-bottom: 1rem;"></i>
-                        <p>Unable to load your courses data.</p>
-                    </div>
-                `;
-            }
-        }
-
-        // Listen for authentication state changes
-        auth.onAuthStateChanged(async (user) => {
-            if (user) {
-                try {
-                    // Load user profile data
-                    loadUserProfile(user.uid);
-                    
-                    // Create the courses chart
-                    createCoursesChart();
-                    
-                    // Listen for changes in user's courses
-                    const enrollmentsRef = ref(database, `users/${user.uid}/enrolledCourses`);
-                    onValue(enrollmentsRef, () => {
-                        console.log("Enrolled courses updated, refreshing chart");
-                        createCoursesChart();
-                    });
-                    
-                } catch (error) {
-                    console.error("Error initializing profile:", error);
-                }
-            } else {
-                // Redirect to login if not logged in
-                window.location.href = "login.html";
-            }
-        });
-
-        async function loadUserProfile(userId) {
-            // Your existing loadUserProfile function...
-        }
-
-        function handleProfilePictureClick() {
-            document.getElementById('profilePictureInput').click();
-        }
-
-        function handleProfilePictureChange(event) {
-            const file = event.target.files[0];
-            if (file) {
-                showLoading(true);
-                
-                // Upload to Firebase Storage
-                const user = auth.currentUser;
-                if (!user) {
-                    showLoading(false);
-                    return;
-                }
-                
-                // Create storage reference
-                const profilePicRef = storageRef(storage, `profile-pictures/${user.uid}`);
-                
-                // Upload file
-                uploadBytes(profilePicRef, file).then((snapshot) => {
-                    // Get download URL
-                    getDownloadURL(snapshot.ref).then((downloadURL) => {
-                        // Update profile picture in database
-                        update(ref(database, 'users/' + user.uid), {
-                            profilePicture: downloadURL
-                        }).then(() => {
-                            // Update UI
-                            document.getElementById('profilePicture').src = downloadURL;
-                            showLoading(false);
-                        }).catch((error) => {
-                            console.error("Error updating profile picture URL:", error);
-                            showLoading(false);
+                    // Add active class to clicked item and corresponding section
+                    item.classList.add('active');
+                    const targetId = item.getAttribute('href').substring(1);
+                    document.getElementById(targetId).classList.add('active');
                         });
-                    }).catch((error) => {
-                        console.error("Error getting download URL:", error);
-                        showLoading(false);
-                    });
-                }).catch((error) => {
-                    console.error("Error uploading profile picture:", error);
-                    showLoading(false);
+            });
+            
+            // Initialize profile page
+            initProfilePage();
                 });
-            }
-        }
     </script>
 </body>
 </html>
