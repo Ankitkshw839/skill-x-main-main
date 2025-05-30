@@ -692,16 +692,35 @@
     <script type="module">
         import { auth, handleLogout } from './auth.js';
         
-        // Try to import local config first, fall back to placeholder config
+        // Try to import configs in order of preference
         let OPENROUTER_CONFIG;
         try {
+            console.log("Attempting to load local config...");
             const localConfig = await import('./config.local.js');
             OPENROUTER_CONFIG = localConfig.OPENROUTER_CONFIG;
             console.log("Using local config");
         } catch (e) {
-            const config = await import('./config.js');
-            OPENROUTER_CONFIG = config.OPENROUTER_CONFIG;
-            console.log("Using placeholder config");
+            console.log("Local config not found, trying production config...");
+            try {
+                const prodConfig = await import('./config.prod.js');
+                OPENROUTER_CONFIG = prodConfig.OPENROUTER_CONFIG;
+                console.log("Using production config");
+            } catch (e2) {
+                console.log("Production config not found, trying placeholder config...");
+                try {
+                    const config = await import('./config.js');
+                    OPENROUTER_CONFIG = config.OPENROUTER_CONFIG;
+                    console.log("Loaded placeholder config:", OPENROUTER_CONFIG);
+                } catch (e3) {
+                    console.error("Failed to load any config:", e3);
+                    OPENROUTER_CONFIG = {
+                        API_KEY: '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',
+                        MODEL: 'nousresearch/deephermes-3-mistral-24b-preview:free',
+                        SITE_NAME: 'Simplexify Learning Platform'
+                    };
+                    console.log("Using hardcoded fallback config");
+                }
+            }
         }
         
         // Add logout functionality
@@ -748,6 +767,8 @@
         async function callEducationAI(query) {
             try {
                 console.log("Calling OpenRouter API with query:", query);
+                console.log("Using API key:", OPENROUTER_CONFIG.API_KEY ? "Key exists (length: " + OPENROUTER_CONFIG.API_KEY.length + ")" : "No key found");
+                console.log("Using model:", OPENROUTER_CONFIG.MODEL);
                 
                 const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
                     method: 'POST',

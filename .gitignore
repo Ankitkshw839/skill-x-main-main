@@ -9,6 +9,7 @@ jspm_packages/
 .env.test.local
 .env.production.local
 config.local.js
+config.prod.js
 
 # API Keys and Secrets
 config.js
