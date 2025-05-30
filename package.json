@@ -1,0 +1,14 @@
+{
+  "name": "simplexify-learning-platform",
+  "version": "1.0.0",
+  "description": "Simplexify Learning Platform",
+  "main": "index.js",
+  "scripts": {
+    "prebuild": "node replace-api-key.js",
+    "build": "echo 'Static site - no build step'",
+    "vercel-build": "node vercel-build.js"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+} 

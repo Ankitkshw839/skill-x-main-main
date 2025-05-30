@@ -691,7 +691,18 @@
 
     <script type="module">
         import { auth, handleLogout } from './auth.js';
-        import { OPENROUTER_CONFIG } from './config.js';
+        
+        // Try to import local config first, fall back to placeholder config
+        let OPENROUTER_CONFIG;
+        try {
+            const localConfig = await import('./config.local.js');
+            OPENROUTER_CONFIG = localConfig.OPENROUTER_CONFIG;
+            console.log("Using local config");
+        } catch (e) {
+            const config = await import('./config.js');
+            OPENROUTER_CONFIG = config.OPENROUTER_CONFIG;
+            console.log("Using placeholder config");
+        }
         
         // Add logout functionality
         document.getElementById('logoutBtn').addEventListener('click', handleLogout);
