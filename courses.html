@@ -64,7 +64,9 @@
             );
             background-size: 300% 300%;
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
+            text-fill-color: transparent;
             animation: gradientFlow 8s ease infinite;
             position: relative;
             display: inline-block;
@@ -285,9 +287,11 @@
         .stat-number {
             font-size: 2rem;
             font-weight: 700;
-            background: linear-gradient(120deg, #4c35de, #e64aa9);
+            background: linear-gradient(to right, #4c35de, #e64aa9);
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
+            text-fill-color: transparent;
         }
 
         .stat-label {
@@ -587,6 +591,25 @@
         window.addEventListener('load', () => {
             revealCards();
             revealFeatured();
+            
+            // Restore saved recommendations if they exist
+            const savedRecommendations = localStorage.getItem('savedRecommendations');
+            if (savedRecommendations) {
+                const recommendedCoursesElement = document.getElementById('recommended-courses');
+                if (recommendedCoursesElement) {
+                    recommendedCoursesElement.innerHTML = savedRecommendations;
+                    
+                    // Re-attach event listeners to the restored enroll buttons
+                    recommendedCoursesElement.querySelectorAll('.enroll-btn').forEach(button => {
+                        if (!button.classList.contains('enrolled')) {
+                            const courseId = button.dataset.courseId;
+                            button.onclick = () => handleEnroll(courseId, button);
+                        }
+                    });
+                    
+                    console.log('Restored saved course recommendations');
+                }
+            }
         });
     </script>
     <script type="module">
@@ -621,12 +644,63 @@
                 button.disabled = true;
                 button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enrolling...';
 
+                // Store current recommendations in localStorage before enrollment
+                const recommendedCoursesElement = document.getElementById('recommended-courses');
+                if (recommendedCoursesElement) {
+                    const recommendedCourses = recommendedCoursesElement.innerHTML;
+                    localStorage.setItem('savedRecommendations', recommendedCourses);
+                }
+
                 // Enroll the user
                 await enrollInCourse(courseId, courseData[courseId]);
 
                 // Update button to show enrolled state
                 button.innerHTML = '<i class="fas fa-check"></i> Enrolled';
                 button.classList.add('enrolled');
+                
+                // Show success message instead of redirecting
+                const successMessage = document.createElement('div');
+                successMessage.className = 'enrollment-success';
+                successMessage.innerHTML = `
+                    <div class="success-icon"><i class="fas fa-check-circle"></i></div>
+                    <h3>Successfully enrolled!</h3>
+                    <p>You can now access this course in your <a href="mycourses.html">My Courses</a> section.</p>
+                    <p>Continue browsing for more courses.</p>
+                `;
+                
+                // Insert success message after the button
+                button.parentNode.appendChild(successMessage);
+                
+                // Add success message styling
+                const style = document.createElement('style');
+                style.textContent = `
+                    .enrollment-success {
+                        margin-top: 15px;
+                        padding: 15px;
+                        background: rgba(52, 168, 83, 0.1);
+                        border: 1px solid #34A853;
+                        border-radius: 8px;
+                        text-align: center;
+                        animation: fadeIn 0.5s ease;
+                    }
+                    .success-icon {
+                        font-size: 2rem;
+                        color: #34A853;
+                        margin-bottom: 10px;
+                    }
+                    .enrollment-success h3 {
+                        color: #34A853;
+                        margin-bottom: 5px;
+                    }
+                    .enrollment-success a {
+                        color: #4285F4;
+                        text-decoration: none;
+                    }
+                    .enrollment-success a:hover {
+                        text-decoration: underline;
+                    }
+                `;
+                document.head.appendChild(style);
 
             } catch (error) {
                 console.error('Error enrolling in course:', error);

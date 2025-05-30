@@ -33,8 +33,8 @@
             pointer-events: none;
         }
         .login-container {
-            width: 420px;
-            height: 580px;
+            width: 560px;
+            height: 590px;
             background: rgba(255, 255, 255, 0.003 );
             border-radius: 22px;
             box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 7.23);
@@ -54,7 +54,7 @@
         .login-container::before {
             content: '';
             position: absolute;
-            width: 150%;
+            width: 290%;
             height: 150%;
             background: radial-gradient(circle, var(--gray-100) 0%, transparent 60%);
             top: -25%;
@@ -64,7 +64,7 @@
         }
 
         .login-header {
-            margin-bottom: 0.3rem;
+            margin-bottom: 0.1rem;
         }
 
         .login-header .logo {
@@ -80,7 +80,7 @@
 
         .login-header h2 {
             font-family: 'Poppins', 'Inter', sans-serif;
-            font-size: 2.5rem;
+            font-size: 2.88rem;
             font-weight: 700;
             letter-spacing: 0.12em;
             color: #e8e8e8e7;
@@ -100,7 +100,7 @@
             display: block;
             margin-bottom: 0.5rem;
             font-weight: 500;
-            color: #ffffff;
+            color: var(--gray-700);
         }
 
         .input-group {
@@ -118,13 +118,6 @@
             -webkit-backdrop-filter: blur(8px);
             box-shadow: 0 2px 8px 0 rgba(31, 38, 135, 0.05);
             border-radius: 999px;
-            width: 100%;
-            max-width: 350px;
-            color: #ffffff;
-        }
-
-        .form-input::placeholder {
-            color: rgba(255, 255, 255, 0.6);
         }
 
         .input-group .input-icon {
@@ -158,16 +151,18 @@
             
         }
 
+
+
         .login-footer {
             margin-top: 1rem;
             font-size: 0.9rem;
-            color: #e0e0e0;
+            color: var(--gray-600);
         }
 
         .login-footer a {
-            color: #ffffff;
+            color: var(--primary-color);
             text-decoration: none;
-            font-weight: 600;
+            font-weight: 500;
         }
 
         .login-footer a:hover {
@@ -252,7 +247,7 @@
             display: block;
             text-align: right;
             font-size: 0.85rem;
-            color: #e0e0e0;
+            color: var(--gray-600);
             text-decoration: none;
             margin-top: 0.5rem;
         }
@@ -401,7 +396,7 @@
                     <span class="input-icon"><i class="fas fa-envelope"></i></span>
                     <input type="email" id="email" name="email" class="form-input" placeholder="Email" required>
                 </div>
-                <div class="error-message" id="email-error"></div>
+                
             </div>
             
             <div class="form-group">
@@ -410,7 +405,7 @@
                     <span class="input-icon"><i class="fas fa-lock"></i></span>
                     <input type="password" id="password" name="password" class="form-input" placeholder="Password" required>
                 </div>
-                <div class="error-message" id="password-error"></div>
+                
                 <a href="#" class="forgot-password">Forgot password?</a>
             </div>
             
@@ -555,5 +550,6 @@
         });
       }
     </script>
+    <script src="./chatbot.js"></script>
 </body>
 </html>

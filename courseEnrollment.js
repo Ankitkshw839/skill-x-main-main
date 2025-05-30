@@ -21,8 +21,51 @@ export async function enrollInCourse(courseId, courseData) {
             ...courseData
         };
 
+        // First, get the current user data to preserve recommendations
+        const userRef = ref(database, `users/${user.uid}`);
+        const userDataSnapshot = await get(userRef);
+        let userData = {};
+        
+        if (userDataSnapshot.exists()) {
+            userData = userDataSnapshot.val();
+            console.log('Retrieved existing user data:', userData);
+        }
+        
+        // Preserve recommendedCourses if they exist
+        const recommendedCourses = userData.recommendedCourses || [];
+        
         // Add to user's enrollments
         await set(ref(database, `enrollments/${user.uid}/${courseId}`), enrollmentData);
+
+        // Also add to the new location to ensure all enrolled courses are visible
+        let enrolledCourses = [];
+        
+        if (userData.enrolledCourses) {
+            if (Array.isArray(userData.enrolledCourses)) {
+                enrolledCourses = userData.enrolledCourses;
+            } else {
+                enrolledCourses = Object.values(userData.enrolledCourses);
+            }
+        }
+        
+        // Check if course is already enrolled to avoid duplicates
+        const courseExists = enrolledCourses.some(course => 
+            course.courseId === courseId || 
+            (course.title && courseData.title && course.title === courseData.title));
+            
+        if (!courseExists) {
+            enrolledCourses.push(enrollmentData);
+        }
+        
+        // Update the user data with both enrolled courses and recommended courses
+        const updatedUserData = {
+            ...userData,
+            enrolledCourses: enrolledCourses,
+            recommendedCourses: recommendedCourses
+        };
+        
+        console.log('Saving updated user data:', updatedUserData);
+        await set(userRef, updatedUserData);
 
         // Update course enrollment count
         const courseRef = ref(database, `courses/${courseId}/enrollmentCount`);

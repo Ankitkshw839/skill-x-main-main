@@ -584,8 +584,8 @@
             <a href="welcome2.html"><i class="fas fa-home"></i> Home</a>
             <a href="mycourses.html"><i class="fas fa-book-open"></i> My Courses</a>
             <a href="dashboard.html" class="active"><i class="fas fa-chart-bar"></i> Dashboard</a>
-           
             <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
+            <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </nav>
     </header>
 
@@ -793,7 +793,7 @@
         // Remove the duplicate firebase imports and initialization
         import { auth as authInstance, handleLogout } from './auth.js';
         import { getEnrolledCourses } from './courseEnrollment.js';
-        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-database.js";
+        import { getDatabase, ref, onValue, get } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-database.js";
 
         // Add Chart.js to create progress chart
         let progressChart = null;
@@ -969,9 +969,86 @@
         async function updateEnrolledCourses() {
             try {
                 const enrolledCoursesList = document.getElementById('enrolled-courses-list');
-                const enrolledCourses = await getEnrolledCourses();
-
-                console.log("Enrolled courses:", enrolledCourses);
+                
+                // Get the current user
+                const user = authInstance.currentUser;
+                if (!user) {
+                    console.error("No user logged in");
+                    return;
+                }
+                
+                // Get enrolled courses from both locations
+                const database = getDatabase();
+                
+                // First check the user's data in the main location
+                const userRef = ref(database, `users/${user.uid}`);
+                const userDataSnapshot = await new Promise((resolve) => {
+                    onValue(userRef, (snapshot) => {
+                        resolve(snapshot);
+                    }, { onlyOnce: true });
+                });
+                
+                let enrolledCourses = [];
+                
+                if (userDataSnapshot.exists()) {
+                    const userData = userDataSnapshot.val();
+                    console.log("User data from Firebase:", userData);
+                    
+                    // Check if enrolledCourses exists in the user data
+                    if (userData.enrolledCourses) {
+                        if (Array.isArray(userData.enrolledCourses)) {
+                            enrolledCourses = [...userData.enrolledCourses];
+                        } else {
+                            enrolledCourses = [...Object.values(userData.enrolledCourses)];
+                        }
+                        console.log("Found enrolled courses:", enrolledCourses.length);
+                    }
+                    
+                    // DO NOT include recommendedCourses in the enrolled section
+                    // Only include specificInterests as they represent user's chosen interests
+                    
+                    // Also check for specificInterests
+                    if (userData.specificInterests) {
+                        // Convert specificInterests to course format
+                        const interestCourses = [];
+                        
+                        if (typeof userData.specificInterests === 'object') {
+                            Object.entries(userData.specificInterests).forEach(([key, value]) => {
+                                // Skip if value is not a string (interest name)
+                                if (typeof value !== 'string') return;
+                                
+                                interestCourses.push({
+                                    id: `interest-${key}`,
+                                    title: value,
+                                    description: `Course related to your interest in ${value}`,
+                                    progress: 0,
+                                    imageUrl: 'https://img.freepik.com/free-vector/online-tutorials-concept_23-2148529858.jpg',
+                                    isInterest: true // Mark as interest for special handling
+                                });
+                            });
+                        }
+                        
+                        enrolledCourses = [...enrolledCourses, ...interestCourses];
+                        console.log("Added specific interests as courses:", interestCourses.length);
+                    }
+                }
+                
+                // If no courses found in the main location, check the old location
+                if (enrolledCourses.length === 0) {
+                    const oldEnrollmentsRef = ref(database, `enrollments/${user.uid}`);
+                    const oldEnrollmentsSnapshot = await new Promise((resolve) => {
+                        onValue(oldEnrollmentsRef, (snapshot) => {
+                            resolve(snapshot);
+                        }, { onlyOnce: true });
+                    });
+                    
+                    if (oldEnrollmentsSnapshot.exists()) {
+                        const oldEnrollments = oldEnrollmentsSnapshot.val();
+                        enrolledCourses = [...enrolledCourses, ...Object.values(oldEnrollments)];
+                    }
+                }
+                
+                console.log("Final enrolled courses to display:", enrolledCourses);
 
                 // Update the dashboard stats
                 updateDashboardStats(enrolledCourses);
@@ -994,13 +1071,17 @@
                     // Use different colors for progress bars
                     const colorClass = `course-${index % 4}`;
                     
+                    // Add a special indicator for interest-based courses
+                    const interestBadge = course.isInterest ? 
+                        `<span class="interest-badge" style="background-color: #FBBC05; color: white; font-size: 0.7rem; padding: 2px 6px; border-radius: 10px; margin-left: 5px;">Interest</span>` : '';
+                    
                     return `
-                        <div class="enrolled-course" data-course-id="${course.title}">
+                        <div class="enrolled-course" data-course-id="${course.courseId || course.id || course.title}">
                         <div class="course-thumbnail">
                                 <img src="${course.imageUrl || 'https://img.freepik.com/free-vector/online-tutorials-concept_23-2148529858.jpg'}" alt="${course.title}">
                         </div>
                         <div class="enrolled-course-info">
-                            <div class="enrolled-course-title">${course.title}</div>
+                            <div class="enrolled-course-title">${course.title}${interestBadge}</div>
                                 <div class="enrolled-course-progress">Progress: ${progressPercent}%</div>
                             <div class="course-progress-bar">
                                     <div class="course-progress" style="width: ${progressPercent}%"></div>
@@ -1051,19 +1132,35 @@
                     console.log("Enrollments updated in Firebase, refreshing display");
                     updateEnrolledCourses();
                 });
+                
+                // Also listen for changes in recommendedCourses
+                const recommendedCoursesRef = ref(database, `users/${user.uid}/recommendedCourses`);
+                onValue(recommendedCoursesRef, (snapshot) => {
+                    console.log("Recommended courses updated in Firebase, refreshing display");
+                    updateEnrolledCourses();
+                });
+                
+                // Also listen for changes in specificInterests
+                const specificInterestsRef = ref(database, `users/${user.uid}/specificInterests`);
+                onValue(specificInterestsRef, (snapshot) => {
+                    console.log("Specific interests updated in Firebase, refreshing display");
+                    updateEnrolledCourses();
+                });
             } else {
                 window.location.replace('login.html');
             }
         });
 
         // Add logout functionality
-        const nav = document.querySelector('nav');
-        const logoutBtn = document.createElement('a');
-        logoutBtn.href = '#';
-        logoutBtn.id = 'logoutBtn';
-        logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Logout';
-        logoutBtn.addEventListener('click', handleLogout);
-        nav.appendChild(logoutBtn);
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                handleLogout();
+            });
+        } else {
+            console.error('Logout button not found');
+        }
     </script>
 
     <script>

@@ -1,4 +1,4 @@
-import { getCurrentUser, saveUserProfile, getUserProfile } from './auth.js';
+import { getCurrentUser, saveUserProfile, getUserProfile, handleLogout } from './auth.js';
 import { getUserCourses } from './communityService.js';
 
 // Initialize the user profile page
@@ -10,6 +10,17 @@ export async function initProfilePage() {
             // Redirect to login if not authenticated
             window.location.href = 'login.html';
             return;
+        }
+        
+        // Set up logout button functionality
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                handleLogout();
+            });
+        } else {
+            console.error('Logout button not found in profile page');
         }
         
         // Load user profile data

@@ -5,7 +5,8 @@ import {
     getUserNotifications,
     getUserFriends,
     getUserCourses,
-    getUserProfile
+    getUserProfile,
+    findFriendsWithSimilarInterests
 } from './communityService.js';
 
 // Store current user ID
@@ -67,6 +68,9 @@ export async function initCommunityPage(userId) {
     setInterval(() => {
         loadNotifications();
     }, 30000); // Check for new notifications every 30 seconds
+    
+    // Set up Find Friend button click handler
+    setupFindFriendButton();
 }
 
 // Set up the tab navigation
@@ -111,7 +115,9 @@ async function loadUserCourses() {
         const sidebarCoursesContainer = document.getElementById('sidebar-courses');
         if (!sidebarCoursesContainer) return;
         
-        const courses = await getUserCourses(currentUserId);
+        const coursesData = await getUserCourses(currentUserId);
+        // Use enrolled courses and interests for sidebar
+        const courses = [...coursesData.enrolled, ...coursesData.interests];
         
         if (!courses || courses.length === 0) {
             sidebarCoursesContainer.innerHTML = `
@@ -129,6 +135,7 @@ async function loadUserCourses() {
         for (let i = 0; i < maxCourses; i++) {
             const course = courses[i];
             const progress = course.progress || 0;
+            const isInterest = course.isInterest ? '<span class="interest-tag">Interest</span>' : '';
             
             html += `
                 <a href="mycourses.html" class="sidebar-course">
@@ -136,7 +143,7 @@ async function loadUserCourses() {
                         <img src="${course.imageUrl || 'https://via.placeholder.com/40'}" alt="${course.title}">
                     </div>
                     <div class="sidebar-course-info">
-                        <div class="sidebar-course-title">${course.title}</div>
+                        <div class="sidebar-course-title">${course.title} ${isInterest}</div>
                         <div class="sidebar-progress-bar">
                             <div class="sidebar-progress" style="width: ${progress}%"></div>
                         </div>
@@ -167,7 +174,9 @@ async function loadUserCourses() {
 async function loadUserStats() {
     try {
         // Get courses
-        const courses = await getUserCourses(currentUserId);
+        const coursesData = await getUserCourses(currentUserId);
+        // Use all courses for stats
+        const courses = coursesData.all;
         const coursesCount = courses ? courses.length : 0;
         document.getElementById('stats-courses').textContent = coursesCount;
         
@@ -206,8 +215,13 @@ async function loadPotentialConnections() {
         if (connections.length === 0) {
             connectionsContainer.innerHTML = `
                 <div class="empty-state">
-                    <p>No potential connections found based on your courses.</p>
-                    <p>Try adding more courses to your profile!</p>
+                    <i class="fas fa-users"></i>
+                    <h3>No potential connections found</h3>
+                    <p>We couldn't find any users who share your interests.</p>
+                    <p>Try adding more specific interests to your profile to find potential connections!</p>
+                    <a href="profile.html" class="primary-btn">
+                        <i class="fas fa-edit"></i> Update Your Interests
+                    </a>
                 </div>
             `;
             return;
@@ -217,6 +231,38 @@ async function loadPotentialConnections() {
         let html = '<div class="connections-grid">';
         
         connections.forEach(connection => {
+            // Create a badge for each matching interest
+            const interestBadges = connection.matchingCourseTitles.map(interest => {
+                // Determine if this is a programming-related interest
+                const isProgramming = ['c++', 'python', 'java', 'javascript', 'programming', 'web'].some(
+                    keyword => interest.toLowerCase().includes(keyword)
+                );
+                
+                // Choose appropriate icon
+                let icon = 'fa-lightbulb';
+                if (isProgramming) {
+                    icon = 'fa-code';
+                } else if (interest.toLowerCase().includes('web')) {
+                    icon = 'fa-globe';
+                } else if (interest.toLowerCase().includes('design')) {
+                    icon = 'fa-paint-brush';
+                } else if (interest.toLowerCase().includes('data')) {
+                    icon = 'fa-database';
+                } else if (interest.toLowerCase().includes('machine') || interest.toLowerCase().includes('ai')) {
+                    icon = 'fa-robot';
+                } else if (interest.toLowerCase().includes('game')) {
+                    icon = 'fa-gamepad';
+                } else if (interest.toLowerCase().includes('cloud')) {
+                    icon = 'fa-cloud';
+                } else if (interest.toLowerCase().includes('security') || interest.toLowerCase().includes('cyber')) {
+                    icon = 'fa-shield-alt';
+                } else if (interest.toLowerCase().includes('blockchain')) {
+                    icon = 'fa-link';
+                }
+                
+                return `<span class="course-tag"><i class="fas ${icon}"></i> ${interest}</span>`;
+            }).join('');
+            
             html += `
                 <div class="connection-card">
                     <div class="connection-profile">
@@ -224,11 +270,9 @@ async function loadPotentialConnections() {
                         <h3>${connection.name}</h3>
                     </div>
                     <div class="connection-details">
-                        <p class="match-count"><i class="fas fa-book"></i> <strong>${connection.matchingCourses} matching ${connection.matchingCourses > 1 ? 'courses' : 'course'}</strong></p>
+                        <p class="match-count"><i class="fas fa-lightbulb"></i> <strong>${connection.matchingCourses} matching ${connection.matchingCourses > 1 ? 'interests' : 'interest'}</strong></p>
                         <div class="matching-courses-list">
-                            ${connection.matchingCourseTitles.map(course => 
-                                `<span class="course-tag">${course}</span>`
-                            ).join('')}
+                            ${interestBadges}
                         </div>
                     </div>
                     <button class="connect-btn" data-user-id="${connection.userId}">Connect</button>
@@ -246,12 +290,14 @@ async function loadPotentialConnections() {
                 await handleSendFriendRequest(recipientId, event.target);
             });
         });
-        
     } catch (error) {
         console.error("Error loading potential connections:", error);
-        document.getElementById('potential-connections').innerHTML = `
-            <div class="alert alert-danger">
-                Error loading connections. Please try again later.
+        const connectionsContainer = document.getElementById('potential-connections');
+        connectionsContainer.innerHTML = `
+            <div class="error-state">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3>Something went wrong</h3>
+                <p>We couldn't load potential connections. Please try again later.</p>
             </div>
         `;
     }
@@ -524,6 +570,161 @@ function showProfileModal(profile, userId) {
             document.body.removeChild(modal);
         }
     });
+}
+
+// Set up Find Friend button click handler
+function setupFindFriendButton() {
+    const findFriendBtn = document.getElementById('find-friend-btn');
+    if (findFriendBtn) {
+        findFriendBtn.addEventListener('click', handleFindFriendClick);
+    }
+}
+
+// Handle Find Friend button click
+async function handleFindFriendClick() {
+    try {
+        const resultsContainer = document.getElementById('friend-finder-results');
+        resultsContainer.innerHTML = '<div class="loading">Finding friends with similar interests...</div>';
+        
+        // Get the result from the ML-based friend matching function
+        const result = await findFriendsWithSimilarInterests(currentUserId);
+        console.log("ML friend matching result:", result);
+        
+        if (!result.matches || result.matches.length === 0) {
+            resultsContainer.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-users"></i>
+                    <h3>No matches found</h3>
+                    <p>${result.message || "Try enrolling in more courses to find people with similar interests."}</p>
+                    <a href="profile.html" class="primary-btn">
+                        <i class="fas fa-edit"></i> Update Your Interests
+                    </a>
+                </div>
+            `;
+            return;
+        }
+        
+        // Build the HTML for matches
+        let html = '<div class="friend-matches">';
+        
+        result.matches.forEach(match => {
+            // Get common courses with highest match score first
+            const commonCoursesHTML = match.commonCourses.map(course => {
+                let courseTitle = '';
+                let otherTitle = '';
+                
+                if (course.matchType === 'exact') {
+                    courseTitle = course.title;
+                    otherTitle = course.title;
+                } else if (course.matchType === 'similar') {
+                    courseTitle = course.title;
+                    otherTitle = course.otherTitle || course.title;
+                }
+                
+                // Determine if this is a programming-related interest
+                const isProgramming = ['c++', 'python', 'java', 'javascript', 'programming', 'web'].some(
+                    keyword => courseTitle.toLowerCase().includes(keyword)
+                );
+                
+                // Choose appropriate icon
+                let icon = 'fa-lightbulb';
+                if (isProgramming) {
+                    icon = 'fa-code';
+                } else if (courseTitle.toLowerCase().includes('web')) {
+                    icon = 'fa-globe';
+                } else if (courseTitle.toLowerCase().includes('design')) {
+                    icon = 'fa-paint-brush';
+                } else if (courseTitle.toLowerCase().includes('data')) {
+                    icon = 'fa-database';
+                } else if (courseTitle.toLowerCase().includes('machine') || courseTitle.toLowerCase().includes('ai')) {
+                    icon = 'fa-robot';
+                } else if (courseTitle.toLowerCase().includes('game')) {
+                    icon = 'fa-gamepad';
+                } else if (courseTitle.toLowerCase().includes('cloud')) {
+                    icon = 'fa-cloud';
+                } else if (courseTitle.toLowerCase().includes('security') || courseTitle.toLowerCase().includes('cyber')) {
+                    icon = 'fa-shield-alt';
+                } else if (courseTitle.toLowerCase().includes('blockchain')) {
+                    icon = 'fa-link';
+                }
+                
+                let matchTypeClass = '';
+                let matchTypeLabel = '';
+                
+                switch(course.matchType) {
+                    case 'exact':
+                        matchTypeClass = 'match-exact';
+                        matchTypeLabel = 'Exact Match';
+                        break;
+                    case 'similar':
+                        matchTypeClass = 'match-similar';
+                        matchTypeLabel = 'Similar';
+                        break;
+                }
+                
+                return `
+                    <div class="common-course ${matchTypeClass}">
+                        <i class="fas ${icon}"></i>
+                        <span class="course-name">${courseTitle}</span>
+                        ${courseTitle !== otherTitle ? 
+                            `<span class="match-type" title="${matchTypeLabel}">matches with "${otherTitle}"</span>` : 
+                            `<span class="match-type" title="${matchTypeLabel}">exact match</span>`
+                        }
+                    </div>
+                `;
+            }).join('');
+            
+            html += `
+                <div class="friend-match-card">
+                    <div class="friend-profile">
+                        <img src="${match.profilePic}" alt="${match.name}" class="profile-pic">
+                        <h3>${match.name}</h3>
+                        <p class="match-score">Match Score: ${Math.round(match.matchScore)}</p>
+                    </div>
+                    <div class="common-courses">
+                        <h4>Common Interests</h4>
+                        <div class="common-courses-list">
+                            ${commonCoursesHTML}
+                        </div>
+                    </div>
+                    <div class="friend-actions">
+                        <button class="connect-btn" data-user-id="${match.userId}">Connect</button>
+                        <button class="view-profile-btn" data-user-id="${match.userId}">View Profile</button>
+                    </div>
+                </div>
+            `;
+        });
+        
+        html += '</div>';
+        resultsContainer.innerHTML = html;
+        
+        // Add event listeners to buttons
+        document.querySelectorAll('#friend-finder-results .connect-btn').forEach(button => {
+            button.addEventListener('click', async (event) => {
+                const recipientId = event.target.getAttribute('data-user-id');
+                await handleSendFriendRequest(recipientId, event.target);
+            });
+        });
+        
+        document.querySelectorAll('#friend-finder-results .view-profile-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const userId = button.getAttribute('data-user-id');
+                const match = result.matches.find(m => m.userId === userId);
+                if (match) {
+                    showProfileModal(match, userId);
+                }
+            });
+        });
+    } catch (error) {
+        console.error("Error finding friends:", error);
+        document.getElementById('friend-finder-results').innerHTML = `
+            <div class="error-state">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3>Something went wrong</h3>
+                <p>We couldn't find friends with similar interests. Please try again later.</p>
+            </div>
+        `;
+    }
 }
 
 // Handle status update post
